@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { SignUpInput } from './dto/signup-input';
-import { UpdateAuthInput } from './dto/update-auth.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -66,22 +65,6 @@ export class AuthService {
     return { accessToken, refreshToken, user: foundUser };
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthInput: UpdateAuthInput) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
-
   async createTokens(userId: number, email: string) {
     const accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
     const refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
@@ -119,5 +102,10 @@ export class AuthService {
         hashedRefreshToken,
       },
     });
+  }
+
+  async logout(userId: number) {
+    await this.userService.resetUserToken(userId);
+    return { loggedOut: true };
   }
 }

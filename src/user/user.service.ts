@@ -13,6 +13,18 @@ export class UserService {
     });
   }
 
+  async resetUserToken(userId: number) {
+    return this.prisma.user.updateMany({
+      where: {
+        id: userId,
+        hashedRefreshToken: { not: null },
+      },
+      data: {
+        hashedRefreshToken: null,
+      },
+    });
+  }
+
   async findAll() {
     return this.prisma.user.findMany({});
   }
