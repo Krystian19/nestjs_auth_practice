@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { SignUpInput } from './dto/signup-input';
 import { UpdateAuthInput } from './dto/update-auth.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
+import { SignInInput } from './dto/signin-input';
 
 @Injectable()
 export class AuthService {
@@ -34,12 +35,47 @@ export class AuthService {
     return { accessToken, refreshToken, user };
   }
 
+  async signIn(signInInput: SignInInput) {
+    const foundUser = await this.findOneWithEmail(signInInput.email);
+    const accessDeniedErr = new ForbiddenException('Access Denied');
+
+    if (!foundUser) {
+      throw accessDeniedErr;
+    }
+
+    const doPasswordsMatch = await argon.verify(
+      foundUser.hashedPassword,
+      signInInput.password,
+    );
+
+    if (!doPasswordsMatch) {
+      throw accessDeniedErr;
+    }
+
+    const { accessToken, refreshToken } = await this.createTokens(
+      foundUser.id,
+      foundUser.email,
+    );
+
+    await this.updateRefreshToken(foundUser.id, refreshToken);
+
+    return { accessToken, refreshToken, user: foundUser };
+  }
+
   findAll() {
     return `This action returns all auth`;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} auth`;
+  }
+
+  async findOneWithEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
   }
 
   update(id: number, updateAuthInput: UpdateAuthInput) {

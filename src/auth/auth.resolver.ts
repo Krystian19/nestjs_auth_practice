@@ -4,6 +4,7 @@ import { Auth } from './entities/auth.entity';
 import { SignUpInput } from './dto/signup-input';
 import { UpdateAuthInput } from './dto/update-auth.input';
 import { SignResponse } from './dto/sign-response';
+import { SignInInput } from './dto/signin-input';
 
 @Resolver(() => Auth)
 export class AuthResolver {
@@ -12,6 +13,11 @@ export class AuthResolver {
   @Mutation(() => SignResponse)
   signUp(@Args('signUpInput') signUpInput: SignUpInput) {
     return this.authService.signUp(signUpInput);
+  }
+
+  @Mutation(() => SignResponse)
+  signIn(@Args('signInInput') signInInput: SignInInput) {
+    return this.authService.signIn(signInInput);
   }
 
   @Query(() => [Auth], { name: 'auth' })
