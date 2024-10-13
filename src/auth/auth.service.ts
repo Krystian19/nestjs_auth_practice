@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
 import { SignInInput } from './dto/signin-input';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private userService: UserService,
   ) {}
 
   async signUp(signUpInput: SignUpInput) {
@@ -36,8 +38,10 @@ export class AuthService {
   }
 
   async signIn(signInInput: SignInInput) {
-    const foundUser = await this.findOneWithEmail(signInInput.email);
     const accessDeniedErr = new ForbiddenException('Access Denied');
+    const foundUser = await this.userService.findOneWithEmail(
+      signInInput.email,
+    );
 
     if (!foundUser) {
       throw accessDeniedErr;
@@ -68,14 +72,6 @@ export class AuthService {
 
   findOne(id: number) {
     return `This action returns a #${id} auth`;
-  }
-
-  async findOneWithEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
   }
 
   update(id: number, updateAuthInput: UpdateAuthInput) {
