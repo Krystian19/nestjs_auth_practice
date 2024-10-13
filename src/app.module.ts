@@ -5,6 +5,7 @@ import { join } from 'path';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
       sortSchema: true,
       playground: true,
     }),
+    UserModule,
     AuthModule,
   ],
   controllers: [],
