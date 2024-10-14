@@ -75,7 +75,7 @@ export class AuthService {
         email,
       },
       {
-        expiresIn: '10s',
+        expiresIn: '1h',
         secret: accessTokenSecret,
       },
     );

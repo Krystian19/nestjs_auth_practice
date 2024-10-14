@@ -14,6 +14,7 @@ type Mutation {
 
 type Query {
   findAllUsers: [User!]!
+  hello: String!
 }
 
 input SignInInput {
